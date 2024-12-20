@@ -3,6 +3,12 @@ import tkinter as tk
 from tkinter import filedialog, messagebox
 from pydub import AudioSegment
 
+# 无ffmpeg的打包指令：pyinstaller --onefile --windowed Main.py
+# 包含ffmpeg打包指令：pyinstaller --onedir --add-binary="C:/Users/Apermesa/Downloads/Compressed/ffmpeg-2024-12-19-git-494c961379-essentials_build/bin/ffmpeg.exe;." --windowed Main.py
+# 若要打包无ffmpeg版本，则删除下面这两行
+ffmpeg_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "ffmpeg.exe")
+AudioSegment.converter = ffmpeg_path
+
 def generate_empty_audio(output_file, file_name):
     """
     生成一个无声的短音频文件，包含标准 MP3 元数据
@@ -31,7 +37,8 @@ def embed_file_in_audio(file_path):
     if not generate_empty_audio(output_audio_file, file_name_with_extension):
         return
 
-    output_file = os.path.join(os.path.dirname(file_path), os.path.splitext(file_name_with_extension)[0] + " (embedded).mp3")
+    output_file = os.path.join(os.path.dirname(file_path),
+                               os.path.splitext(file_name_with_extension)[0] + " (embedded).mp3")
     try:
         with open(output_audio_file, "rb") as audio, open(file_path, "rb") as file:
             with open(output_file, "wb") as output:
@@ -95,16 +102,21 @@ def extract_action():
 
 # 创建主界面
 root = tk.Tk()
-root.title("文件嵌入与提取工具")
-root.geometry("400x200")
+root.title("文件伪装音频工具")
+root.geometry("300x220")
+root.resizable(False, False)
 
 # 嵌入按钮
-embed_button = tk.Button(root, text="嵌入文件到音频", command=embed_action, height=2, width=20)
+embed_button = tk.Button(root, text="嵌入", command=embed_action, height=2, width=20)
 embed_button.pack(pady=20)
 
 # 提取按钮
-extract_button = tk.Button(root, text="提取文件从音频", command=extract_action, height=2, width=20)
+extract_button = tk.Button(root, text="提取", command=extract_action, height=2, width=20)
 extract_button.pack(pady=20)
+
+# 作者标签
+author_label = tk.Label(root, text="作者：Apermesa", font=("Arial", 10))
+author_label.pack(side="bottom", pady=10)
 
 # 运行主循环
 root.mainloop()
